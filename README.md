@@ -1,5 +1,5 @@
-# simple-drools-cep
-A simple Drools Fusion CEP example.
+# simple-drools-cep apat
+A simple Drools Fusion CEP example. 
 
 The demo loads a set of events (Airport bag-scanning events) from a CVS file.
 
