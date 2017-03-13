@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<description>Simple Drools Fusion CEP demo.</description>
-	<artifactId>simple-drools-cep</artifactId>
+	<artifactId>simple-drools-cep-apat</artifactId>
 	<groupId>org.jboss.ddoyle.drools.cep.demo</groupId>
 	<version>1.0.0-SNAPSHOT</version>
 
 	<properties>
-		<version.org.kie>6.2.0.Final</version.org.kie>
+		<version.org.kie>6.5.0.Final</version.org.kie>
 		<version.org.slf4j>1.7.5</version.org.slf4j>
 		<version.ch.qos.logback>1.1.0</version.ch.qos.logback>
 		<version.commons.lang>2.6</version.commons.lang>

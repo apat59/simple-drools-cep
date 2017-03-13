@@ -28,7 +28,7 @@ public class Main {
 
 	private static final String CEP_STREAM = "AirportStream";
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		LOGGER.info("Initialize KIE.");
 
 		KieServices kieServices = KieServices.Factory.get();
@@ -37,7 +37,12 @@ public class Main {
 
 		// Initializing KieSession.
 		LOGGER.info("Creating KieSession.");
-		KieSession kieSession = kieContainer.newKieSession();
+		final KieSession kieSession = kieContainer.newKieSession();
+		new Thread( new Runnable(){
+            public void run(){ kieSession.fireUntilHalt(); }
+        } ).start();
+		Thread.sleep( 250 );
+		
 		try {
 			//Load the facts/events from our CSV file.
 			InputStream eventsInputStream = Main.class.getClassLoader().getResourceAsStream(EVENTS_CSV_FILE);
@@ -47,7 +52,7 @@ public class Main {
 				//Insert the event into the session
 				insert(kieSession, CEP_STREAM, nextEvent);
 				//And now, fire the rules. In a real application, you probably want to batch the inserts instead of firing rules after every insert.
-				kieSession.fireAllRules();
+				//kieSession.fireAllRules();
 			}
 		
 		} finally {
@@ -56,6 +61,7 @@ public class Main {
 			 * continuously insert new incoming events into the session.
 			 */
 			LOGGER.info("Disposing session.");
+			Thread.sleep( 1000 );
 			kieSession.dispose();
 		}
 	}
