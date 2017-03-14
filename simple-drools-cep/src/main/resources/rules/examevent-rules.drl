@@ -30,7 +30,7 @@ rule "timestamp rule"
 when
     $examEvent:ExamEvent (activity == "launch", state == "SCHEDULE") from entry-point GUMTREE    
 then
-	System.out.println("rule trigerred: " + (clock.getCurrentTime() - $examEvent.getTimestamp() ) + " before event timestamp value");	
+	System.out.println("timestamp rule trigerred: " + (clock.getCurrentTime() - $examEvent.getTimestamp() ) + " before event timestamp value");	
 end
 
 /*rule "timer on timestamp field?"

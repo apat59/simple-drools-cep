@@ -1,5 +1,8 @@
 package com.acme;
 
+import java.util.concurrent.TimeUnit;
+
+import org.drools.core.time.SessionPseudoClock;
 import org.jboss.ddoyle.drools.cep.demo.model.ExamEvent;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -36,7 +39,6 @@ public class BasicsTests {
 		// Initializing KieSession.
 		logger.info("Creating KieSession.");
 		final KieSession kieSession = kieContainer.newKieSession("ksession-rules-test-realtime");
-		//kieSession.fireAllRules();
 		new Thread(new Runnable() {
             public void run() {
             	kieSession.fireUntilHalt();
@@ -56,12 +58,51 @@ public class BasicsTests {
 		EntryPoint ep = kieSession.getEntryPoint(stream);
 		ep.insert(scheduledOntimeEvent);
 		
-		//pseudoClock.advanceTime(4,TimeUnit.SECONDS);
 		System.out.println(clock.getCurrentTime());
-		//pseudoClock.advanceTime(7,TimeUnit.SECONDS);
-		Thread.sleep(21000);
-		//cepService.advancedTime();
-		//cepService.forceFire();
+		// just in case my understanding of the doc is correct
+		// btw allows to test the timer using real time clock
+		Thread.sleep(12000);
+		kieSession.dispose();	
+		kieContainer.dispose();
+	}
+	/*
+	 * we have the Exam start late rule that trigger is a SUCCESS event is not inserted within 5s
+	 * testing using pseudo clock
+	 * Using the realtime clock, it works
+	 */
+	@Test
+	public void pseudoClockTest() throws InterruptedException{
+		logger.info("Initialize KIE.");
+		KieServices kieServices = KieServices.Factory.get();
+		KieContainer kieContainer = kieServices.getKieClasspathContainer();
+
+		// Initializing KieSession.
+		logger.info("Creating KieSession.");
+		final KieSession kieSession = kieContainer.newKieSession("ksession-rules-test-pseudo");
+		new Thread(new Runnable() {
+            public void run() {
+            	kieSession.fireUntilHalt();
+            }
+        }).start();
+		SessionPseudoClock clock = (SessionPseudoClock)kieSession.getSessionClock();
+		kieSession.setGlobal("clock", clock);
+		
+		
+		//long sec10Later = clock.getCurrentTime() + 10000;
+		//long sec20Later = clock.getCurrentTime() + 20000;
+		ExamEvent scheduledOntimeEvent = new ExamEvent("launch", "SCHEDULE", "ontime", clock.getCurrentTime(),"");
+		//ExamEvent actualOntimeEvent = new ExamEvent("launch", "SUCCESS", "ontime", sec20Later,"");
+		
+		String stream = "GUMTREE";
+		logger.debug("Inserting fact with id: '" + scheduledOntimeEvent.getSessionId() + "' into stream: " + stream);
+		EntryPoint ep = kieSession.getEntryPoint(stream);
+		ep.insert(scheduledOntimeEvent);
+		
+		// timer set to 5 sec, so we go far later
+		clock.advanceTime(10,TimeUnit.SECONDS);
+		System.out.println(clock.getCurrentTime());
+		// just in case
+		Thread.sleep(500);
 		kieSession.dispose();	
 		kieContainer.dispose();
 	}
