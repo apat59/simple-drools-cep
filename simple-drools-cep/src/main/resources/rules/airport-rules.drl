@@ -11,9 +11,10 @@ end
 
 
 rule "BaggageLostAtSorting"
+	timer(10m)
 when
     $b1:BagScannedEvent( location == Location.CHECK_IN ) from entry-point AirportStream
-    not BagScannedEvent( bagTag.id == $b1.bagTag.id, location == Location.SORTING, this after[0s,10m] $b1 ) from entry-point AirportStream
+    not BagScannedEvent( bagTag.id == $b1.bagTag.id, location == Location.SORTING ) from entry-point AirportStream
 then
 	System.out.println("Baggage lost at sorting. BagTag ID: " + $b1.getBagTag().getId());
 end

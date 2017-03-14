@@ -2,5 +2,7 @@
 <kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
     <kbase name="rules" equalsBehavior="equality" eventProcessingMode="stream" packages="rules">
         <ksession name="ksession-rules" default="true" type="stateful" clockType="pseudo"/>
+        <ksession name="ksession-rules-test-realtime" default="false" type="stateful" clockType="realtime"/>
+        <ksession name="ksession-rules-test-pseudo" default="false" type="stateful" clockType="pseudo"/>
     </kbase>
 </kmodule>

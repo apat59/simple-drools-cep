@@ -1,0 +1,72 @@
+package com.redhat.cert.monitoring.cep;
+
+import org.jboss.ddoyle.drools.cep.demo.model.ExamEvent;
+import org.kie.api.time.SessionClock;
+
+global SessionClock clock;
+
+declare ExamEvent
+    @role( event )
+    @timestamp( timestamp )
+    @expires( 2d )
+end
+
+declare Schedule
+    @role( fact )    
+end
+
+rule "Exam start late"
+	timer(5s)
+when
+    $examEvent:ExamEvent (activity == "launch", state == "SCHEDULE") from entry-point GUMTREE
+    not ExamEvent(activity == "launch", state == "SUCCESS", sessionId == $examEvent.sessionId ) from entry-point GUMTREE
+then
+	System.out.println("ALERT- setup is late: " + $examEvent.getSessionId());
+end
+
+
+
+rule "timestamp rule"
+when
+    $examEvent:ExamEvent (activity == "launch", state == "SCHEDULE") from entry-point GUMTREE    
+then
+	System.out.println("rule trigerred: " + (clock.getCurrentTime() - $examEvent.getTimestamp() ) + " before event timestamp value");	
+end
+
+/*rule "timer on timestamp field?"
+	timer(int: 2s 2s)
+	//timer(expr : start:$start)
+when
+    //$examEvent:ExamEvent (activity == "launch", state == "SCHEDULE", clock.getCurrentTime() > timestamp) from entry-point GUMTREE
+    $examEvent:ExamEvent (activity == "launch", state == "SCHEDULE") from entry-point GUMTREE
+    //not ExamEvent(activity == "launch", state == "SCHEDULE", sessionId == $examEvent.sessionId ) from entry-point AirportStream
+then
+	System.out.println("timer trigger: " + (clock.getCurrentTime() - $examEvent.getTimestamp() ));
+	//+ (clock.getCurrentTime()) - $examEvent.getTimestamp()
+end*/
+
+
+/*rule "ATest"
+timer (cron:0/5 * * * * ?)
+when
+    $b1:Schedule () from entry-point GUMTREE
+    ExamEvent( sessionId == $b1.sessionId ) from entry-point GUMTREE
+then
+	System.out.println("matching");
+end
+
+rule "AnotherTest"
+when
+    $b1:Schedule () from entry-point GUMTREE
+    not ExamEvent( sessionId == $b1.sessionId, this after[0s,2s] $b1) from entry-point GUMTREE
+then
+	System.out.println("timeout");
+end
+
+rule "gotone"
+when
+    $b1:Schedule () from entry-point GUMTREE   
+then
+	System.out.println("got one");
+	$b1.setExam("yahoo");
+end*/
